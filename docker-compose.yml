@@ -1,0 +1,86 @@
+# Docker Compose configuration file for running n8n with PostgreSQL
+# Version specifies the syntax version of the Compose file
+version: '3.7'
+
+# Define the services (containers) to run
+services:
+  # Define the n8n service
+  n8n:
+    # Use the official n8n Docker image
+    image: n8nio/n8n
+    # Assign a specific name to the container for easier identification
+    container_name: n8n
+    # Set the restart policy: 'unless-stopped' ensures the container restarts automatically
+    # unless it was manually stopped.
+    restart: unless-stopped
+    # Map port 5678 on the host machine to port 5678 in the container
+    ports:
+      - "5678:5678"
+    # Define environment variables for the container
+    environment:
+      # Set a timezone to ensure correct scheduling of workflows.
+      # Find your timezone here: https://momentjs.com/timezone/
+      # Example: America/New_York, Europe/Berlin, Asia/Tokyo
+      - GENERIC_TIMEZONE=Europe/Warsaw # <-- ADJUST THIS TO YOUR TIMEZONE
+
+      # --- Database Configuration ---
+      # Tell n8n to use PostgreSQL
+      - DB_TYPE=postgresdb
+      # Hostname of the database service (must match the service name below)
+      - DB_POSTGRESDB_HOST=postgres
+      # Default PostgreSQL port
+      - DB_POSTGRESDB_PORT=5432
+      # Database name (must match POSTGRES_DB in the postgres service)
+      - DB_POSTGRESDB_DATABASE=n8n
+      # Database user (must match POSTGRES_USER in the postgres service)
+      - DB_POSTGRESDB_USER=n8n
+      # Database password (must match POSTGRES_PASSWORD in the postgres service)
+      - DB_POSTGRESDB_PASSWORD=n8n
+      # Disable SSL for local connection (adjust if needed)
+      - DB_POSTGRESDB_SSL_ENABLED=false
+
+    # Define volumes to persist data
+    volumes:
+      # Mount a local directory named 'n8n_data' into the container's data directory.
+      # This ensures your workflows and credentials persist even if the container is removed.
+      # Docker Compose will create the 'n8n_data' directory in the same folder as this file.
+      - ./n8n_data:/home/node/.n8n
+    # --- Database Dependency ---
+    # Make n8n wait for the postgres service to be healthy before starting.
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Define the PostgreSQL database service
+  postgres:
+    # Use an official PostgreSQL image (e.g., version 15 on Alpine Linux)
+    image: postgres:15-alpine
+    # Assign a name to the PostgreSQL container
+    container_name: n8n_postgres
+    # Set the restart policy
+    restart: unless-stopped
+    # Define environment variables for PostgreSQL setup
+    environment:
+      - POSTGRES_USER=n8n             # Database username
+      - POSTGRES_PASSWORD=n8n # <-- !!! CHANGE THIS TO A STRONG PASSWORD !!!
+      - POSTGRES_DB=n8n               # Database name
+    # Mount a local directory named 'postgres_data' for persistent database storage
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    # Define a healthcheck to ensure the database is ready before n8n starts
+    healthcheck:
+      # Command to check if the database is accepting connections
+      test: ["CMD-SHELL", "pg_isready -U n8n -d n8n"]
+      # How often to run the check
+      interval: 5s
+      # How long to wait for the check to complete
+      timeout: 5s
+      # Number of times to retry if the check fails
+      retries: 10
+
+# Define named volumes for data persistence
+volumes:
+  # Declares the named volume used by the n8n service for its data
+  n8n_data: {}
+  # Declares the named volume used by the postgres service for its data
+  postgres_data: {}
