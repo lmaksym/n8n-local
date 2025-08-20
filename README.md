@@ -7,8 +7,17 @@ This repository provides a Docker Compose configuration for running [n8n](https:
 Before you begin, ensure you have the following installed on your system:
 
 ### Required Software
+Choose one of the following container runtimes:
+
+**Option 1: Docker (Recommended)**
 - **Docker**: Install Docker Desktop from [docker.com](https://www.docker.com/products/docker-desktop/)
 - **Docker Compose**: Usually included with Docker Desktop (for standalone installation, see [Docker Compose docs](https://docs.docker.com/compose/install/))
+
+**Option 2: Podman (Open Source Alternative)**
+- **Podman**: Rootless, daemonless container engine
+- **Installation Guide**: See our comprehensive [Podman Installation Guide](PODMAN_INSTALL.md)
+
+**Additional Requirements**
 - **Git** (optional): For cloning the repository
 
 ### System Requirements
@@ -56,21 +65,39 @@ The Docker Compose file is pre-configured with the following defaults:
 
 ## 🏃‍♂️ Running n8n
 
-### Start the Services
+### With Docker
 
 ```bash
 # Start n8n and PostgreSQL in detached mode
 docker-compose up -d
 ```
 
+### With Podman
+
+If you're using Podman instead of Docker, you have two options:
+
+```bash
+# Option 1: Using podman-compose (if available)
+podman-compose up -d
+
+# Option 2: Using docker-compose with Podman backend (recommended)
+docker-compose up -d
+```
+
+📖 **Need help installing Podman?** Check our [Podman Installation Guide](PODMAN_INSTALL.md) for detailed instructions.
+
 ### Verify Installation
 
 ```bash
 # Check if containers are running
 docker-compose ps
+# or with Podman
+podman-compose ps
 
 # View logs (optional)
 docker-compose logs -f n8n
+# or with Podman
+podman-compose logs -f n8n
 ```
 
 ### Access n8n
@@ -84,6 +111,7 @@ docker-compose logs -f n8n
 
 ### Essential Commands
 
+**With Docker:**
 ```bash
 # Start services
 docker-compose up -d
@@ -107,10 +135,45 @@ docker-compose pull
 docker-compose up -d
 ```
 
+**With Podman:**
+```bash
+# Start services
+podman-compose up -d
+# or
+docker-compose up -d  # if using Docker Compose with Podman
+
+# Stop services
+podman-compose down
+# or
+docker-compose down
+
+# View running containers
+podman-compose ps
+# or
+docker-compose ps
+
+# View logs
+podman-compose logs -f n8n
+# or
+docker-compose logs -f n8n
+
+# Restart services
+podman-compose restart
+# or
+docker-compose restart
+
+# Update to latest n8n version
+podman-compose pull
+podman-compose up -d
+# or
+docker-compose pull
+docker-compose up -d
+```
+
 ### Data Management
 
 ```bash
-# Backup your n8n data
+# Backup your n8n data (works with both Docker and Podman)
 docker-compose exec postgres pg_dump -U n8n n8n > n8n_backup.sql
 
 # Stop services (keeps data)
@@ -146,9 +209,13 @@ netstat -ano | findstr :5678  # Windows
 ```bash
 # Check container logs
 docker-compose logs n8n
+# or with Podman
+podman-compose logs n8n
 
-# Ensure Docker is running
+# Ensure Docker/Podman is running
 docker --version
+# or
+podman --version
 ```
 
 **Database connection issues:**
@@ -166,6 +233,9 @@ docker-compose up -d n8n
 sudo chown -R $USER:$USER ./n8n_data ./postgres_data
 ```
 
+**Podman-specific issues:**
+- See the [Podman Installation Guide](PODMAN_INSTALL.md#troubleshooting) for Podman-specific troubleshooting
+
 ### Reset Installation
 
 To start fresh with a clean installation:
@@ -173,12 +243,16 @@ To start fresh with a clean installation:
 ```bash
 # Stop services and remove all data
 docker-compose down -v
+# or with Podman
+podman-compose down -v
 
 # Remove local data directories
 rm -rf ./n8n_data ./postgres_data
 
 # Start services again
 docker-compose up -d
+# or with Podman
+podman-compose up -d
 ```
 
 ## 🎯 Next Steps
@@ -195,6 +269,7 @@ After successful installation:
 - [n8n Official Documentation](https://docs.n8n.io/)
 - [n8n Community Forum](https://community.n8n.io/)
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
+- [Podman Installation Guide](PODMAN_INSTALL.md) (Alternative to Docker)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 
 ## ⚠️ Security Notes
@@ -208,4 +283,6 @@ After successful installation:
 
 ## 📄 License
 
-This project is open source. Please refer to n8n's [license](https://github.com/n8n-io/n8n/blob/master/LICENSE.md) for usage terms.
+This project is open source under the MIT License. See [LICENSE](LICENSE) file for details.
+
+Please refer to n8n's [license](https://github.com/n8n-io/n8n/blob/master/LICENSE.md) for usage terms.
