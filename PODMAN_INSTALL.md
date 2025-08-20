@@ -88,11 +88,22 @@ docker-compose --version
 ```
 
 ### Method 2: Podman Desktop (GUI)
-```bash
-# Install Podman Desktop via Homebrew
-brew install --cask podman-desktop
 
-# Or download manually from: https://podman-desktop.io/downloads/macos
+**Installation:**
+1. Visit the official Podman Desktop website: **[podman-desktop.io](https://podman-desktop.io/downloads/macos)**
+2. Download the macOS installer (.dmg file)
+3. Install Podman Desktop following the installation wizard
+
+**Install podman-compose separately:**
+```bash
+# After installing Podman Desktop, install podman-compose via Homebrew
+brew install podman-compose
+
+# Or install via pip
+pip3 install podman-compose
+
+# Verify installation
+podman-compose --version
 ```
 
 ### Configure Docker Compatibility
@@ -120,9 +131,29 @@ fi
 ## 🪟 Windows
 
 ### Method 1: Podman Desktop (Recommended)
-1. **Download**: Visit [podman-desktop.io](https://podman-desktop.io/downloads/windows)
-2. **Install**: Run the installer as Administrator
-3. **Setup**: Launch Podman Desktop and initialize machine when prompted
+
+**Installation:**
+1. Visit the official Podman Desktop website: **[podman-desktop.io](https://podman-desktop.io/downloads/windows)**
+2. Download the Windows installer (.exe file)
+3. Run the installer as Administrator
+4. Follow the installation wizard
+5. Launch Podman Desktop and initialize machine when prompted
+
+**Install podman-compose separately:**
+
+After installing Podman Desktop, you need to install `podman-compose` manually:
+
+```powershell
+# Option 1: Install via pip (requires Python)
+pip install podman-compose
+
+# Option 2: Install via Chocolatey
+choco install podman-compose
+
+# Option 3: Download binary from GitHub releases
+# Visit: https://github.com/containers/podman-compose/releases
+# Download and place in your PATH
+```
 
 ### Method 2: Windows Subsystem for Linux (WSL2)
 ```powershell
@@ -134,10 +165,9 @@ wsl --install
 ```
 
 ### Method 3: Manual Installation
-1. **Download**: Get `podman-remote-release-windows_amd64.zip` from [GitHub releases](https://github.com/containers/podman/releases)
-2. **Extract**: To `C:\Program Files\Podman`
-3. **PATH**: Add to system PATH environment variable
-4. **Initialize**:
+1. **Download**: Visit **[podman.io/getting-started/installation](https://podman.io/getting-started/installation#windows)** for the latest releases
+2. **Extract**: Follow the installation instructions on the official website
+3. **Initialize**:
    ```powershell
    podman machine init
    podman machine start
@@ -166,6 +196,9 @@ podman run --rm hello-world
 # Check Docker Compose compatibility
 docker-compose --version
 
+# Check podman-compose (if installed)
+podman-compose --version
+
 # Test with a simple compose file
 echo "version: '3'
 services:
@@ -181,11 +214,10 @@ rm test-compose.yml
 
 Once Podman is installed and configured, you can use it with the n8n setup:
 
-### Option 1: Direct Podman Commands
+### Option 1: Direct Podman Commands (if podman-compose is installed)
 ```bash
 cd n8n-local
 
-# If podman-compose is available
 podman-compose up -d
 podman-compose ps
 podman-compose logs -f n8n
@@ -206,6 +238,19 @@ docker-compose down
 ## 🛠️ Troubleshooting
 
 ### Common Issues
+
+**"podman-compose: command not found":**
+```bash
+# Install podman-compose separately
+# macOS
+brew install podman-compose
+
+# or via pip
+pip3 install podman-compose
+
+# Windows (PowerShell)
+pip install podman-compose
+```
 
 **"Connection refused" errors:**
 ```bash
@@ -242,9 +287,17 @@ echo $DOCKER_HOST
 export DOCKER_HOST=unix:///tmp/podman-run-$(id -u)/podman/podman.sock
 ```
 
+### Podman Desktop Specific Issues
+
+**Missing podman-compose after Podman Desktop installation:**
+- Podman Desktop doesn't include `podman-compose` by default
+- Install it separately using the methods shown above
+- Alternatively, use `docker-compose` with Podman backend
+
 ## 📚 Additional Resources
 
-- [Podman Official Documentation](https://docs.podman.io/)
+- [Podman Official Website](https://podman.io/)
+- [Podman Installation Documentation](https://podman.io/getting-started/installation)
 - [Podman Desktop](https://podman-desktop.io/)
 - [Podman vs Docker Comparison](https://docs.podman.io/en/latest/markdown/podman.1.html#comparison-with-docker)
 - [Podman Compose Documentation](https://github.com/containers/podman-compose)
